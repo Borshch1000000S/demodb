@@ -17,6 +17,7 @@ public class Driver {
     private Integer IdDriver;
     private String firstName;
     private String secondName;
+    private String driverLicense;
     private String mobilePhone;
     private String email;
     private String car;
