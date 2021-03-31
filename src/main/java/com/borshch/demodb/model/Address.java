@@ -1,5 +1,6 @@
 package com.borshch.demodb.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,7 +22,9 @@ public class Address {
     private String numberOfHouse;
     private String numberOfAppartmnet;
 
+    @JsonIgnoreProperties("addresses") // игнорировать json-атрибут поля для объекта класса
     @ManyToOne
+
     private Customer customer;
 
 }

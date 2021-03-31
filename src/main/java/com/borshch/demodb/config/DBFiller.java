@@ -55,8 +55,8 @@ public class DBFiller {
         address1.setIndex(127018);
         address1.setNumberOfHouse("1");
         address1.setNumberOfAppartmnet("55");
-        addressRepository.save(address1);
         address1.setCustomer(c1);
+        addressRepository.save(address1);
 
 
 
@@ -69,17 +69,18 @@ public class DBFiller {
         Good good1 = new Good();
         good1.setPriceBuyed(1.0);
         good1.setPriceOfCellWithoutDiscount(5.0);
+        good1.setCategory(cat1);
         goodRepository.save(good1);
         //
-        good1.setCategory(cat1);
+
 
         Manager manager1 = new Manager();
         manager1.setLogin("prodavan1");
         manager1.setPassword("1");
         manager1.setSalary(100);
-
-        managerRepository.save(manager1);
         c1.setPersonalManager(manager1);
+        managerRepository.save(manager1);
+
 
         //
 
@@ -252,7 +253,7 @@ public class DBFiller {
         c3.setSecondName("борщёв3");
         c3.setMobilePhone("+7-926-839-7983");
         c3.setEmail("3000000proekt@list.ru");
-        c3.setBirthDay(LocalDateTime.of(1985, 04, 07, 33,0, 0,0));
+        c3.setBirthDay(LocalDateTime.of(1985, 04, 07, 23,0, 0,0));
         customerRepository.save(c3);
 // перед ссылками друг на друга сохранить!!!
 
