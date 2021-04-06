@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Corsina {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idCorsina;
     private LocalDateTime dateOfCreation;
     private LocalDateTime dateOfLastChange;

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Order {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idOrder;
     private LocalDateTime dateOfPay;
     private LocalDateTime dateOfDelivery;

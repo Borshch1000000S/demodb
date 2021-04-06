@@ -14,7 +14,7 @@ import java.util.List;
 public class Manager {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
     private String login;

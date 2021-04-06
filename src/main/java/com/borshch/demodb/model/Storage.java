@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class Storage {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToMany(mappedBy = "storage")
