@@ -1,5 +1,6 @@
 package com.borshch.demodb.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;

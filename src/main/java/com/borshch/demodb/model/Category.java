@@ -16,8 +16,6 @@ public class Category {
 
     private String category;
 
-    @OneToMany(mappedBy = "category")
-    private List<Good> good;
 
 
 }

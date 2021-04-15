@@ -1,5 +1,6 @@
 package com.borshch.demodb.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ public class User {
     private Integer id;// только с объектами
 
     private String login;
+    @JsonIgnore // никому никогда не отдавать
     private String password;
 
 

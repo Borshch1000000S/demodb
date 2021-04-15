@@ -24,7 +24,6 @@ public class Address {
 
     @JsonIgnoreProperties("addresses") // игнорировать json-атрибут поля для объекта класса
     @ManyToOne
-
     private Customer customer;
 
 }
