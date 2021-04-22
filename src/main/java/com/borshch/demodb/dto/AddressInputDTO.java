@@ -12,5 +12,4 @@ public class AddressInputDTO {
     private Integer index;
     private String numberOfHouse;
     private String numberOfAppartmnet;
-
 }

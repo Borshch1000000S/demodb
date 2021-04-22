@@ -15,5 +15,4 @@ public class AddressOutputDTO { // создали dto, чтобы возвращ
     private Integer index;
     private String numberOfHouse;
     private String numberOfAppartmnet;
-
 }
