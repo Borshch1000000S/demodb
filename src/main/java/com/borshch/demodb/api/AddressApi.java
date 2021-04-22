@@ -6,6 +6,8 @@ import com.borshch.demodb.mapper.AddressDTOMapper;
 import com.borshch.demodb.model.Address;
 import com.borshch.demodb.repository.AddressRepository;
 import com.borshch.demodb.service.AddressService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController //бины, которые принимают http запросы к приложению - это рестконтроллер
 // просто контроллер - устаревшая аннотация, серверный рендеринг и т.д., именно РЕСТ говорит о том, что все входящие
@@ -34,8 +37,17 @@ public class AddressApi {
 // Или воспользоваться библиотеками, а то тупо получается
 
 
+    //Swagger (OpenApi) - формат документации RESTApi, актуальна 3 версия.
+    //https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui/1.5.7
+
+
+    @Operation(summary="получить страницу адресов") // для документации Swagger, аннотация Operation для методов,
+    //Parameter для qwery param-ов
+    //для классов и для полей классов Schema (тело запроса или параметры тела запроса)
     @GetMapping     //если запрос Гет, то в ответе сработает вот этот метод
-    public List<AddressOutputDTO> getAll(@RequestParam(required = false, defaultValue = "20") Integer limit,
+    public List<AddressOutputDTO> getAll(@Parameter(description = "количество записей на странице")
+                                             @RequestParam(required = false, defaultValue = "20") Integer limit,
+                                         @Parameter(description = "индекс страницы, начиная с 0 (для первой)")
                                          @RequestParam(required = false, defaultValue = "0") Integer offset) {
 
         System.out.println("limit = " + limit);
@@ -43,17 +55,13 @@ public class AddressApi {
         // limit  - колво элементов, offset - смещение
         //по страницам поиска
 
-        List<Address> listofAllAddresses = addressService.getAll();
-        List<AddressOutputDTO> listOfOutputDTO = new ArrayList<AddressOutputDTO>(); // Можно в АПИ пользоваться арээйлистом? Можно!
+        List<Address> listofAllAddresses = addressService.getAll(limit, offset).getContent();
+        // Можно в АПИ пользоваться арээйлистом? Можно!
 
-        for (int i = 0; i < listofAllAddresses.size(); i++) {
+        List<AddressOutputDTO> listOfOutputDTO = listofAllAddresses.stream().map(a -> addressDTOMapper.convertToOutputDTO(a)).collect(Collectors.toList());
 
-            AddressOutputDTO dtoi = new AddressOutputDTO();
-            dtoi = addressDTOMapper.convertToOutputDTO(listofAllAddresses.get(i));
-
-            listOfOutputDTO.add(dtoi);
-        }
         return listOfOutputDTO;
+
 
     }
 
@@ -64,10 +72,7 @@ public class AddressApi {
 
         Address address = addressService.getByID(id).orElseThrow(() -> new EntityNotFoundException("Address with id = " + id + " not found"));
 
-        AddressOutputDTO dto = new AddressOutputDTO();
-        dto = addressDTOMapper.convertToOutputDTO(address);
-
-        return dto;
+        return addressDTOMapper.convertToOutputDTO(address);
     }
 
 
@@ -82,15 +87,9 @@ public class AddressApi {
     @ResponseStatus(HttpStatus.CREATED) // чтобы 201 "создано"
 
     public AddressOutputDTO save(@RequestBody AddressInputDTO addressInputDTO) {
-
-        Address address = new Address();
-        address = addressDTOMapper.convertToEntity(addressInputDTO);
-
+        Address address = addressDTOMapper.convertToEntity(addressInputDTO);
         addressService.save(address); // переписать через сервис
-
-        AddressOutputDTO addressOutputDTO = new AddressOutputDTO();
-        addressOutputDTO = addressDTOMapper.convertToOutputDTO(address);
-
+        AddressOutputDTO addressOutputDTO = addressDTOMapper.convertToOutputDTO(address);
         return addressOutputDTO;
     }
 
@@ -106,20 +105,15 @@ public class AddressApi {
     @PutMapping("/{id}")
     public AddressOutputDTO update(@PathVariable("id") Integer id, @RequestBody AddressInputDTO addressInputDTO) {
 
-        Address address = new Address();
-        AddressOutputDTO addressOutputDTO = new AddressOutputDTO();
-
-        address = addressDTOMapper.convertToEntity(addressInputDTO);
+        Address address = addressDTOMapper.convertToEntity(addressInputDTO);
         address.setId(id);
 
         addressService.save(address);
         //сохранили через сервис в репозиторий
 
-        addressOutputDTO = addressDTOMapper.convertToOutputDTO(address);
-
+        AddressOutputDTO addressOutputDTO = addressDTOMapper.convertToOutputDTO(address);
         return addressOutputDTO;
     }
-
 
 }
 
@@ -132,3 +126,9 @@ public class AddressApi {
 //офиц документация спринга
 
 //MVC - model(rep), view (интерфейс, общение с пользователем, то есть у нас Api, RESTController), c (controller - то, что сервис)
+
+//HW 22.04.2021 - переделать исходящее dto из getAll запроса, чтобы в нем содержалась информация
+// о общем количестве страниц и общим количеством элементов
+
+
+//

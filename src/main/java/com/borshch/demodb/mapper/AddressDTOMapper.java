@@ -2,6 +2,7 @@ package com.borshch.demodb.mapper;
 
 import com.borshch.demodb.dto.AddressInputDTO;
 import com.borshch.demodb.dto.AddressOutputDTO;
+import com.borshch.demodb.dto.AddressOutputPageDTO;
 import com.borshch.demodb.model.Address;
 import org.springframework.stereotype.Component;
 
@@ -37,4 +38,6 @@ public class AddressDTOMapper {
 
         return addressOutputDTO;
     }
+
+    public AddressOutputPageDTO convert 
 }
