@@ -4,7 +4,10 @@ import com.borshch.demodb.dto.AddressInputDTO;
 import com.borshch.demodb.dto.AddressOutputDTO;
 import com.borshch.demodb.dto.AddressOutputPageDTO;
 import com.borshch.demodb.model.Address;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 @Component
 
@@ -39,5 +42,12 @@ public class AddressDTOMapper {
         return addressOutputDTO;
     }
 
-    public AddressOutputPageDTO convert 
+    public AddressOutputPageDTO convertToOutPutPageDTO (Page <Address> pageOfAddresses) {
+        AddressOutputPageDTO addressOutputPageDTO = new AddressOutputPageDTO();
+        addressOutputPageDTO.setListOfAddresses(pageOfAddresses.toList().stream().map(a-> convertToOutputDTO(a)).collect(Collectors.toList()));
+        addressOutputPageDTO.setNumberOfPages(pageOfAddresses.getTotalPages());
+        addressOutputPageDTO.setNumberOfElements(pageOfAddresses.getTotalElements());
+        return addressOutputPageDTO;
+    }
+
 }

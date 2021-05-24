@@ -1,4 +1,5 @@
 package com.borshch.demodb.model;
+import com.borshch.demodb.constraint.Phone;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -23,6 +24,7 @@ public class Customer {
     private String firstName;
     private String secondName;
 
+@Phone(message = "телефон д.б. указан корректно в формате...")
     private String mobilePhone;
     private String email;
 

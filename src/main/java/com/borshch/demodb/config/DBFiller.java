@@ -60,7 +60,7 @@ public class DBFiller {
         c1.setPassword("1");
         c1.setFirstName("саша1");
         c1.setSecondName("борщёв1");
-        c1.setMobilePhone("+7-926-839-7981");
+        c1.setMobilePhone("+7(926)8397981");
         c1.setEmail("1000000proekt@list.ru");
         c1.setBirthDay(LocalDateTime.of(1987, 04, 17, 11,0, 0,0));
         c1.setPersonalManager(manager1);
@@ -73,6 +73,7 @@ public class DBFiller {
 
         Address address1 = new Address();
         address1.setCountry("Israel");
+        address1.setRegion("Всем привет");
         address1.setCity("Tel-Aviv");
         address1.setStreet("Disengoff str.");
         address1.setIndex(127018);
