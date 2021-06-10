@@ -3,6 +3,7 @@ package com.borshch.demodb.api;
 
 import com.borshch.demodb.model.Customer;
 import com.borshch.demodb.repository.CustomerRepository;
+import com.borshch.demodb.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class CustomerApi {
+
+
+    private final CustomerService customerService;
     private final CustomerRepository customerRepository;
+    //private final
 
     @GetMapping     //запрос get
     public List<Customer> getAll(){
