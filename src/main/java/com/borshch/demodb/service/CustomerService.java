@@ -1,6 +1,7 @@
 package com.borshch.demodb.service;
 
 
+import com.borshch.demodb.model.Address;
 import com.borshch.demodb.model.Customer;
 import com.borshch.demodb.repository.AddressRepository;
 import com.borshch.demodb.repository.CorsinaRepository;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 
 @Service // сервисный бин - логика, отличается от @Component тем, что туда записывают логику, "истории"
@@ -19,6 +21,7 @@ import javax.persistence.EntityNotFoundException;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
+
 
     //private final AddressRepository addressRepository;
     //private final AddressService addressService;
@@ -50,7 +53,6 @@ public class CustomerService {
 
         Customer savedCustomer = customerRepository.save(customer); // внутри вызывается Validator // входящая перед вызовом метода
         System.out.println("savedCustomer = " + savedCustomer);
-
 
         return savedCustomer;
     }

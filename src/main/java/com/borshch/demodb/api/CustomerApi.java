@@ -5,8 +5,10 @@ import com.borshch.demodb.dto.CustomerInputDTO;
 import com.borshch.demodb.dto.CustomerOutputDTO;
 import com.borshch.demodb.dto.CustomerOutputPageDTO;
 import com.borshch.demodb.mapper.CustomerDTOMapper;
+import com.borshch.demodb.model.Address;
 import com.borshch.demodb.model.Customer;
 import com.borshch.demodb.repository.CustomerRepository;
+import com.borshch.demodb.service.AddressService;
 import com.borshch.demodb.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RestController
@@ -29,6 +32,8 @@ public class CustomerApi {
     private final CustomerService customerService;
     private final CustomerRepository customerRepository;
     private final CustomerDTOMapper customerDTOMapper;
+    private final AddressService addressService;
+
 
     @Operation(summary = "получить страницу клиентов")
     @GetMapping
@@ -37,7 +42,7 @@ public class CustomerApi {
                                         @Parameter(description = "ндекс страницы, начиная с 0 (для первой)")
                                         @RequestParam(required = false, defaultValue = "0") Integer offset) {
 
-        Page <Customer> listOfCustomers = customerService.getAll(limit, offset);
+        Page<Customer> listOfCustomers = customerService.getAll(limit, offset);
         CustomerOutputPageDTO customerOutputPageDTO = customerDTOMapper.convertToOutPutPageDTO(listOfCustomers);
         return customerOutputPageDTO;
     }
@@ -57,6 +62,16 @@ public class CustomerApi {
     public CustomerOutputDTO save(@RequestBody @Valid CustomerInputDTO customerInputDTO) {
 
         Customer customer = customerDTOMapper.convertToEntity(customerInputDTO);
+
+
+        //ДУМАЮ, ЭТО НЕ НАДО
+//        List<Address> listOfAddresses = customer.getAddresses();
+//
+//        for (int i = 0; i < listOfAddresses.size(); i++) {
+//            addressService.save(listOfAddresses.get(i));
+//        } // сохранили вложенные адреса
+
+
         return customerDTOMapper.convertToOutputDTO(customerService.save(customer));
     }
 
@@ -72,6 +87,23 @@ public class CustomerApi {
     @PutMapping("/{id}")
     public CustomerOutputDTO update(@PathVariable("id") Integer id, @RequestBody CustomerInputDTO customerInputDTO) {
         Customer customer = customerDTOMapper.convertToEntity(customerInputDTO);
+
+        //УДАЛИТЬ ЛИ СТАРЫЕ СВЯЗАННЫЕ АДРЕСА, КАК МУСОР ПРИ АПДЕЙТЕ????? ИЛИ ОНО АВТОМАТИЧЕСКИ ОТРАБОТАЕТ КАК ВЛОЖЕННЫЕ СУЩНОСТИ???
+
+//        CustomerOutputDTO oldCustomer = getOne(id);
+//        List<Address> listOfOldAddresses = oldCustomer.getAddresses();
+//
+//        for (int i = 0; i < listOfOldAddresses.size(); i++) {
+//            addressService.deleteById(listOfOldAddresses.get(i).getId());
+//        }
+//
+//        List<Address> listOfAddresses = customer.getAddresses();
+//
+//        for (int i = 0; i < listOfAddresses.size(); i++) {
+//            addressService.save(listOfAddresses.get(i));
+//        } // сохранили вложенные адреса
+
+
         customer.setIdCustomer(id);
         return customerDTOMapper.convertToOutputDTO(customer);
     }
