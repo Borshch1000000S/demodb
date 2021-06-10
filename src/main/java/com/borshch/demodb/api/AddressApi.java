@@ -102,9 +102,7 @@ public class AddressApi {
     @Operation(summary = "удалить объект из БД по номеру id")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void delete(@PathVariable("id") Integer id) {
-        addressService.deleteById(id);
-    }
+    public void delete(@PathVariable("id") Integer id) {addressService.deleteById(id);}
 
 
     @Operation(summary = "перезаписать объект в БД по номеру id")

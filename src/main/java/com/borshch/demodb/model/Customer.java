@@ -33,9 +33,7 @@ public class Customer {
 
     private LocalDateTime birthDay;
     private LocalDateTime registrationDate;
-    private LocalDateTime lastVisitDate;
 
-    private Integer numberOfVisitsFRorLastMonth;
 
 
 
