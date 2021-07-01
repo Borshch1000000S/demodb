@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "Orders") //переименовали
 @Data
-
+@Table(name = "Orders")
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idOrder;
@@ -34,6 +34,6 @@ public class Order {
     @ManyToOne
     private Driver driver;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     private List <OrderGoods> orderGoods;
 }

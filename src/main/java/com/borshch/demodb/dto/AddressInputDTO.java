@@ -8,7 +8,6 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class AddressInputDTO {
 
-    @NotBlank(message = "поле country должно содержать хотя бы один значимый символ")
 
     @NotBlank(message = "поле country должно содержать хотя бы один значимый символ") // проверка на черный символ, Java Validation Constraints
     private String country;

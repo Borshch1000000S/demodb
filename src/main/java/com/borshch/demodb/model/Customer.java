@@ -18,7 +18,9 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idCustomer;
 
+    //найти польз. БД по логину
     private String login;
+
     private String password;
 
     private String firstName;
@@ -32,6 +34,7 @@ public class Customer {
 
 
     private LocalDateTime birthDay;
+
     private LocalDateTime registrationDate;
 
 
@@ -42,10 +45,10 @@ public class Customer {
     @ManyToOne
     private Manager personalManager;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Address> addresses;//связь с адресами
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Corsina currentCorsina;
 
     @OneToMany(mappedBy = "customer")

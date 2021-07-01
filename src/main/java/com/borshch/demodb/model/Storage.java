@@ -13,7 +13,7 @@ public class Storage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(mappedBy = "storage")
+    @OneToMany(mappedBy = "storage", cascade = CascadeType.REMOVE)
     private List<StorageGoods> storageGoods;
 
     @Enumerated(EnumType.STRING)

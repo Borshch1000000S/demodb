@@ -23,8 +23,7 @@ public class Corsina {
     //DTO data transfer object - объект состава трансфера данных, это класс, повторяющий сам класс - модель,
     //но с другим набором полей, сам dto - объект преобразуется в объект оригинального entity
 
-    @OneToMany(mappedBy = "corsina")
+    @OneToMany(mappedBy = "corsina", cascade = CascadeType.REMOVE)  //24.06.2021 г.
     private List<CorsinaGoods> corsinaGoods; //
-
 
 }

@@ -16,10 +16,10 @@ public class CorsinaGoods {
     private Integer id;
 
     @ManyToOne
-    private Corsina corsina; //
+    private Corsina corsina;
 
     @ManyToOne
-    private Good good; //
+    private Good good;
 
     private Integer numberOfGoods;
 

@@ -54,6 +54,12 @@ public class CustomerApi {
         return customerDTOMapper.convertToOutputDTO(customerService.getByID(id));
     }
 
+    @Operation(summary = "получить исходящий трансплортный объект клиента по логину")
+    @GetMapping("/login/{login}")
+    public CustomerOutputDTO getByLogin(@PathVariable("login") String login) {
+        return customerDTOMapper.convertToOutputDTO(customerService.getByLogin(login));
+    }
+
 
     @Operation(summary = "создание объекта клиента в БД")
     @PostMapping
@@ -64,12 +70,7 @@ public class CustomerApi {
         Customer customer = customerDTOMapper.convertToEntity(customerInputDTO);
 
 
-        //ДУМАЮ, ЭТО НЕ НАДО
-//        List<Address> listOfAddresses = customer.getAddresses();
-//
-//        for (int i = 0; i < listOfAddresses.size(); i++) {
-//            addressService.save(listOfAddresses.get(i));
-//        } // сохранили вложенные адреса
+        //убрали костыль
 
 
         return customerDTOMapper.convertToOutputDTO(customerService.save(customer));
@@ -88,25 +89,12 @@ public class CustomerApi {
     public CustomerOutputDTO update(@PathVariable("id") Integer id, @RequestBody CustomerInputDTO customerInputDTO) {
         Customer customer = customerDTOMapper.convertToEntity(customerInputDTO);
 
-        //УДАЛИТЬ ЛИ СТАРЫЕ СВЯЗАННЫЕ АДРЕСА, КАК МУСОР ПРИ АПДЕЙТЕ????? ИЛИ ОНО АВТОМАТИЧЕСКИ ОТРАБОТАЕТ КАК ВЛОЖЕННЫЕ СУЩНОСТИ???
-
-//        CustomerOutputDTO oldCustomer = getOne(id);
-//        List<Address> listOfOldAddresses = oldCustomer.getAddresses();
-//
-//        for (int i = 0; i < listOfOldAddresses.size(); i++) {
-//            addressService.deleteById(listOfOldAddresses.get(i).getId());
-//        }
-//
-//        List<Address> listOfAddresses = customer.getAddresses();
-//
-//        for (int i = 0; i < listOfAddresses.size(); i++) {
-//            addressService.save(listOfAddresses.get(i));
-//        } // сохранили вложенные адреса
-
+       //убрали костыль
 
         customer.setIdCustomer(id);
         return customerDTOMapper.convertToOutputDTO(customer);
     }
+
 
 }
 
