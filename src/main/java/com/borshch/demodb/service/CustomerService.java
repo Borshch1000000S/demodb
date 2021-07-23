@@ -50,9 +50,10 @@ public class CustomerService {
     @Transactional // т.к. сохраняется клиент и вложенная сущность - адрес
     public Customer save(Customer customer) {
 
-        if (customer.getCurrentCorsina().getCorsinaGoods().isEmpty()) { // если пустая, то приделать сразу корзину, никогда не null
+        if (customer.getCurrentCorsina()==null) { // если пустая, то приделать сразу корзину, никогда не null
             // ни у одного customer-а
             Corsina corsina = new Corsina(); //empty
+            corsinaService.save(corsina);
             customer.setCurrentCorsina(corsinaService.save(corsina));
         }
 
@@ -64,8 +65,8 @@ public class CustomerService {
         return savedCustomer;
     }
 
-    @Transactional // т.к. сохраняется клиент и вложенные сущности; добавил возможность обновить по id
-    public Customer put(Customer customer, Integer id) {
+    @Transactional // т.к. сохраняется клиент и вложенные сущности (адрес); добавил возможность обновить по id
+    public Customer update(Customer customer, Integer id) { // в терминологии сервиса это не Put, а Update
         customer.setIdCustomer(id);
         customerRepository.save(customer);
 

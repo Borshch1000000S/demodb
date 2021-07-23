@@ -28,6 +28,7 @@ public class Customer {
 
 @Phone(message = "телефон д.б. указан корректно в формате...")
     private String mobilePhone;
+//допилить проверку e-mail
     private String email;
 
 
