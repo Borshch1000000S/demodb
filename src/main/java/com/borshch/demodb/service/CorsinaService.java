@@ -9,6 +9,7 @@ import com.borshch.demodb.repository.CorsinaGoodsRepository;
 import com.borshch.demodb.repository.CorsinaRepository;
 import com.borshch.demodb.repository.GoodRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +26,10 @@ import java.util.Optional;
 
 @Service // сервисный бин - логика, отличается от @Component тем, что туда записывают логику, "истории"
 @RequiredArgsConstructor
+@Slf4j
 public class CorsinaService {
 
     private final CorsinaRepository corsinaRepository;
-    private final CustomerService customerService;
     private final GoodRepository goodRepository;
     private final CorsinaGoodsRepository corsinaGoodsRepository;
 
@@ -42,6 +43,7 @@ public class CorsinaService {
      */
 
     public Page<Corsina> getAll(Integer limit, Integer offset) {
+        log.info("get page of corsina with limit {} and offset {}", limit, offset);
         Pageable page = PageRequest.of(offset, limit);
         return corsinaRepository.findAll(page); //выдать пустой список
     }
@@ -49,14 +51,20 @@ public class CorsinaService {
     //JavaDoc используется только внутри Java
 
     public Corsina getByID(Integer id) {
-
+        log.info("get corsina by id {}", id); // залогировали
         return corsinaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Corsina with id = " + id + " not found"));
     }
 
     public Corsina save(Corsina corsina) {   // просто сохранение, также сохранение без авторизации (авторизация только при оформлении заказа)
 
+        log.info("save corsina {}", corsina.toString());
+
         Corsina savedCorsina = corsinaRepository.save(corsina); // внутри вызывается Validator // входящая перед вызовом метода
-        System.out.println("savedCorsina = " + savedCorsina);
+
+        Integer id = corsina.getIdCorsina();
+
+        if (!corsinaRepository.existsById(id)) {throw new EntityNotFoundException("Corsina with id = " + id + " is not saved");}
+
         return savedCorsina;
     }
 
@@ -64,65 +72,78 @@ public class CorsinaService {
 
     @Transactional
     public Corsina discardCorsina(Integer id) { // по id корзины
-        Corsina corsina = new Corsina();
+        log.info("discard corsina with id {}", id);
+        if (!corsinaRepository.existsById(id)) {throw new EntityNotFoundException("Corsina with id = " + id + " is not saved");}
+        else
+        {Corsina corsina = new Corsina();
+
         // по id корзины удалить все вложенные строки
+
         corsina.setIdCorsina(id);
         corsinaRepository.save(corsina);
-        return corsina;
+
+        log.debug("corsina saved");
+
+        corsinaGoodsRepository.deleteByCorsinaIdCorsina(id); // это нормально, правильно?
+
+        log.debug("corsina goods deleted");
+        return corsina;}
     }
 
     @Transactional
-    public Corsina addNewRowToCorsina(Integer id, Good good, Integer numberOfGoods) {
-        Corsina corsina = corsinaRepository.getOne(id);
+    public Corsina addNewRowToCorsina(Integer idCorsina, Integer idGood, Integer numberOfGoods) {
+        Corsina corsina = corsinaRepository.getOne(idCorsina);
         List <CorsinaGoods> listOfCorsinaGoods = corsina.getCorsinaGoods();
-
         CorsinaGoods corsinaGoods = new CorsinaGoods();
-
+        corsinaGoods.setGood(goodRepository.getOne(idGood));
         corsinaGoods.setNumberOfGoods(numberOfGoods);
-        corsinaGoods.setGood(good);
+
+        corsinaGoodsRepository.save(corsinaGoods);
 
         listOfCorsinaGoods.add(corsinaGoods);
+
         corsina.setCorsinaGoods(listOfCorsinaGoods);
 
-        corsinaGoodsRepository.save(corsinaGoods);
-        return corsinaRepository.save(corsina);
+                return corsina;
     }
 
     @Transactional
-    public Corsina removeRowFromCorsina(Integer id, Integer numberOfRowInCorsina) { // переделать по id товара
-        Corsina corsina = corsinaRepository.getOne(id);
+    public Corsina removeRowFromCorsina(Integer idCorsina, Integer idGood) {
+        Corsina corsina = corsinaRepository.getOne(idCorsina);
         List <CorsinaGoods> listOfCorsinaGoods = corsina.getCorsinaGoods();
-        listOfCorsinaGoods.remove(numberOfRowInCorsina);
+
+        corsinaGoodsRepository.deleteByGoodIdGoodAndCorsinaIdCorsina(idGood, idCorsina);
         return corsinaRepository.save(corsina);
     }
 
+
+
+
     @Transactional
-    public Corsina changeNumberOfGoodsInRow (Integer id, Integer numberOfRowInCorsina, Integer numberOfGoods) { //переделать на вызов 1 приватного метода
+    public Corsina changeNumberOfGoodsInRow (Integer id, Integer idGood, Integer numberOfGoods) { //переделать на вызов 1 приватного метода
         Corsina corsina = corsinaRepository.getOne(id);
         List <CorsinaGoods> listOfCorsinaGoods = corsina.getCorsinaGoods();
-        CorsinaGoods corsinaGoods = listOfCorsinaGoods.get(numberOfRowInCorsina);
+        CorsinaGoods corsinaGoods = corsinaGoodsRepository.findByGood_IdGoodAndCorsinaIdCorsina(idGood, id);
         corsinaGoods.setNumberOfGoods(numberOfGoods);
-
         corsinaGoodsRepository.save(corsinaGoods);
+
         return corsinaRepository.save(corsina);
     }
 
-    @Transactional
-    public Corsina incrementNumberOfGoodsInRow (Integer id, Integer numberOfRowInCorsina) {
-        Corsina corsina = corsinaRepository.getOne(id);
-        List <CorsinaGoods> listOfCorsinaGoods = corsina.getCorsinaGoods();
-        CorsinaGoods corsinaGoods = listOfCorsinaGoods.get(numberOfRowInCorsina);
-        corsinaGoods.setNumberOfGoods(corsinaGoods.getNumberOfGoods()+1);
 
-        corsinaGoodsRepository.save(corsinaGoods);
-        return corsinaRepository.save(corsina);
+    @Transactional
+    public Corsina incrementNumberOfGoodsInRow (Integer id, Integer idGood) {
+        Integer numberOfGoods = corsinaGoodsRepository.findByGood_IdGoodAndCorsinaIdCorsina(idGood, id).getNumberOfGoods();
+        return changeNumberOfGoodsInRow(id, idGood, (numberOfGoods + 1));
     }
 
     @Transactional
-    public Corsina decrementNumberOfGoodsInRow (Integer id, Integer numberOfRowInCorsina) {
+    public Corsina decrementNumberOfGoodsInRow (Integer id, Integer idGood) {
         Corsina corsina = corsinaRepository.getOne(id);
         List <CorsinaGoods> listOfCorsinaGoods = corsina.getCorsinaGoods();
-        CorsinaGoods corsinaGoods = listOfCorsinaGoods.get(numberOfRowInCorsina);
+
+        CorsinaGoods corsinaGoods = corsinaGoodsRepository.findByGood_IdGoodAndCorsinaIdCorsina(idGood, id);
+
         corsinaGoods.setNumberOfGoods(corsinaGoods.getNumberOfGoods()-1);
         if (corsinaGoods.getNumberOfGoods()==0) {corsinaGoodsRepository.delete(corsinaGoods);}
         else {corsinaGoodsRepository.save(corsinaGoods);}

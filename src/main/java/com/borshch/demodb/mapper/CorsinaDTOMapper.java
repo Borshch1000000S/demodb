@@ -1,19 +1,20 @@
 package com.borshch.demodb.mapper;
 
 
-import com.borshch.demodb.dto.CorsinaInputDTO;
-import com.borshch.demodb.dto.CorsinaOutputDTO;
-import com.borshch.demodb.dto.CorsinaOutputPageDTO;
-import com.borshch.demodb.dto.CustomerInputDTO;
+import com.borshch.demodb.dto.*;
 import com.borshch.demodb.model.Corsina;
 import com.borshch.demodb.model.Customer;
+import com.borshch.demodb.service.CorsinaService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class CorsinaDTOMapper {
+
 
     public Corsina convertToEntity(CorsinaInputDTO corsinaInputDTO) {
         Corsina corsina = new Corsina();
@@ -24,6 +25,7 @@ public class CorsinaDTOMapper {
 
         return corsina;
     }
+
 
     public CorsinaOutputDTO convertToOutputDTO (Corsina corsina) {
         CorsinaOutputDTO corsinaOutputDTO = new CorsinaOutputDTO();

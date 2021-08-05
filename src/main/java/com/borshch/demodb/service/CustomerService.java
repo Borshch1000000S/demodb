@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CorsinaService corsinaService;
+    private final EmailSender emailSender;
 
     @Transactional // так как возможно изменение общего списка клиентов при запросе GetAll
     public Page<Customer> getAll(Integer limit, Integer offset) {
@@ -62,6 +64,8 @@ public class CustomerService {
 
         System.out.println("savedCustomer = " + savedCustomer);
 
+        emailSender.newCustomerMessage(savedCustomer.getEmail());
+
         return savedCustomer;
     }
 
@@ -77,5 +81,6 @@ public class CustomerService {
     public void deleteById(Integer id) {
         customerRepository.deleteById(id);
     }
+
 
 }

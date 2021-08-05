@@ -1,6 +1,7 @@
 package com.borshch.demodb.api;
 
 import com.borshch.demodb.dto.CorsinaInputDTO;
+import com.borshch.demodb.dto.CorsinaInputDtoWithGoodIdAndNumberOfGoods;
 import com.borshch.demodb.dto.CorsinaOutputDTO;
 import com.borshch.demodb.dto.CorsinaOutputPageDTO;
 import com.borshch.demodb.mapper.CorsinaDTOMapper;
@@ -38,7 +39,7 @@ public class CorsinaApi {
     @GetMapping
     public CorsinaOutputPageDTO getAll(@Parameter(description = "колчество записей на странице")
                                        @RequestParam(required = false, defaultValue = "20") Integer limit,
-                                       @Parameter(description = "ндекс страницы, начиная с 0 (для первой)")
+                                       @Parameter(description = "индекс страницы, начиная с 0 (для первой)")
                                        @RequestParam(required = false, defaultValue = "0") Integer offset) {
 
         Page<Corsina> listOfCorsinas = corsinaService.getAll(limit, offset);
@@ -59,50 +60,65 @@ public class CorsinaApi {
 
     // 1) Вообще у клиента автоматически формируется пустая, если не было иной до регистрации, корзина в CustomerService, но нужно иметь возможность сбросить корзину
     //до нуля как отдельная опция
-    @Operation(summary = "создание новой пустой корзины по переданному id корзины (сброс корзины)")
-    @PutMapping("/{id}")
+    @Operation(summary = "по переданному id корзины сброс корзины")
+    @PutMapping("/{id}/discard")
     public CorsinaOutputDTO discardCorsina(@PathVariable("id") Integer id) { //по id корзину
         return corsinaDTOMapper.convertToOutputDTO(corsinaService.discardCorsina(id));
             }
 
+//
+
 // 2) Добавить строку по id корзины, товару,
 
     @Operation(summary = "добавить строку товара с его количеством в корзину")
-    @PutMapping("/{id}")
-    public CorsinaOutputDTO addNewRowToCorsina(@PathVariable("id") Integer id, Good good, Integer numberOfGoods) { // на каждый случай пишем свою dto
-        return corsinaDTOMapper.convertToOutputDTO(corsinaService.addNewRowToCorsina(id, good, numberOfGoods));
+    @PatchMapping("/{id}/add")
+    public CorsinaOutputDTO addNewRowToCorsina(@PathVariable("id") Integer id, CorsinaInputDtoWithGoodIdAndNumberOfGoods corsinaInputDtoWithGoodIdAndNumberOfGoods) { // на каждый случай пишем свою dto
+        Integer numberOfGoods = corsinaInputDtoWithGoodIdAndNumberOfGoods.getNumberOfGoods();
+        Integer idGood = corsinaInputDtoWithGoodIdAndNumberOfGoods.getIdGood();
+
+        Corsina corsina = corsinaService.getByID(id);
+
+        return corsinaDTOMapper.convertToOutputDTO(corsinaService.addNewRowToCorsina(id, idGood, numberOfGoods));
     }
 
 // 3) Удалить строку товара и его количества из корзины
 
     @Operation(summary = "удалить строку товара и его количества из корзины")
-    @PostMapping("/{id}")
-    public CorsinaOutputDTO removeRowFromCorsina (@PathVariable("id") Integer id, Integer numberOfRowInCorsina) {
-        return corsinaDTOMapper.convertToOutputDTO(corsinaService.removeRowFromCorsina(id, numberOfRowInCorsina));
+    @PatchMapping("/{id}/remove")
+    public CorsinaOutputDTO removeRowFromCorsina (@PathVariable("id") Integer id, CorsinaInputDtoWithGoodIdAndNumberOfGoods corsinaInputDtoWithGoodIdAndNumberOfGoods) {
+        Integer idGood = corsinaInputDtoWithGoodIdAndNumberOfGoods.getIdGood();
+        return corsinaDTOMapper.convertToOutputDTO(corsinaService.removeRowFromCorsina(id, idGood));
     }
 
 // Изменить количество товаров в корзине // это надо прописать в корзина/товар - вот там и реализуем, см. CorsinaGoodsApi
 
     @Operation(summary = "изменить количество товара в строке товара")
-    @PutMapping("/{id}")
-    public CorsinaOutputDTO changeNumberOfGoodsInRow (@PathVariable("id") Integer id, Integer numberOfRowInCorsina, Integer numberOfGoods) {
-    return corsinaDTOMapper.convertToOutputDTO(corsinaService.changeNumberOfGoodsInRow(id, numberOfRowInCorsina, numberOfGoods));
+    @PatchMapping("/{id}/change")
+    public CorsinaOutputDTO changeNumberOfGoodsInRow (@PathVariable("id") Integer id, CorsinaInputDtoWithGoodIdAndNumberOfGoods corsinaInputDtoWithGoodIdAndNumberOfGoods) {
+
+        Integer idGood = corsinaInputDtoWithGoodIdAndNumberOfGoods.getIdGood();
+        Integer numberOfGoods = corsinaInputDtoWithGoodIdAndNumberOfGoods.getNumberOfGoods();
+
+        return corsinaDTOMapper.convertToOutputDTO(corsinaService.changeNumberOfGoodsInRow(id, idGood, numberOfGoods));
     }
 
 // Увеличить количество товаров в корзине // это надо прописать в корзина/товар - вот там и реализуем, см. CorsinaGoodsApi
 
     @Operation(summary = "увеличить на 1 количество товара в строке товара")
-    @PutMapping("/{id}")
-    public CorsinaOutputDTO incrementNumberOfGoodsInRow (@PathVariable("id") Integer id, Integer numberOfRowInCorsina) {
-        return corsinaDTOMapper.convertToOutputDTO(corsinaService.incrementNumberOfGoodsInRow(id, numberOfRowInCorsina));
+    @PatchMapping("/{id}/incr")
+    public CorsinaOutputDTO incrementNumberOfGoodsInRow (@PathVariable("id") Integer id, CorsinaInputDtoWithGoodIdAndNumberOfGoods corsinaInputDtoWithGoodIdAndNumberOfGoods) {
+        Integer idGood = corsinaInputDtoWithGoodIdAndNumberOfGoods.getIdGood();
+        return corsinaDTOMapper.convertToOutputDTO(corsinaService.incrementNumberOfGoodsInRow(id, idGood));
     }
 
     // Уменьшить количество товаров в корзине // это надо прописать в корзина/товар - вот там и реализуем, см. CorsinaGoodsApi
 
     @Operation(summary = "уменьшить на 1 количество товара в строке товара")
-    @PutMapping("/{id}")
-    public CorsinaOutputDTO decrementNumberOfGoodsInRow (@PathVariable("id") Integer id, Integer numberOfRowInCorsina) {
-        return corsinaDTOMapper.convertToOutputDTO(corsinaService.decrementNumberOfGoodsInRow(id, numberOfRowInCorsina));
+    @PatchMapping("/{id}/decr")
+    public CorsinaOutputDTO decrementNumberOfGoodsInRow (@PathVariable("id") Integer id, CorsinaInputDtoWithGoodIdAndNumberOfGoods corsinaInputDtoWithGoodIdAndNumberOfGoods) {
+
+        Integer idGood = corsinaInputDtoWithGoodIdAndNumberOfGoods.getIdGood();
+        return corsinaDTOMapper.convertToOutputDTO(corsinaService.decrementNumberOfGoodsInRow(id, idGood));
     }
 
 
@@ -113,7 +129,7 @@ public class CorsinaApi {
 
 // Получить корзину по id клиента
     @Operation(summary = "получить транспортный объект текущей корзины по id пользователя")
-    @GetMapping("/{id}") // пользователя
+    @GetMapping("/{id}/getByCustomerId") // пользователя
     public CorsinaOutputDTO getCorsinaByCustomerId(@PathVariable ("id") Integer id) {
         Customer customer = customerService.getByID(id);
         return corsinaDTOMapper.convertToOutputDTO(customer.getCurrentCorsina());

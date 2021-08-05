@@ -6,9 +6,11 @@ import com.borshch.demodb.dto.CustomerOutputDTO;
 import com.borshch.demodb.dto.CustomerOutputPageDTO;
 import com.borshch.demodb.mapper.CustomerDTOMapper;
 import com.borshch.demodb.model.Address;
+import com.borshch.demodb.model.Corsina;
 import com.borshch.demodb.model.Customer;
 import com.borshch.demodb.repository.CustomerRepository;
 import com.borshch.demodb.service.AddressService;
+import com.borshch.demodb.service.CorsinaService;
 import com.borshch.demodb.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +35,7 @@ public class CustomerApi {
     private final CustomerRepository customerRepository;
     private final CustomerDTOMapper customerDTOMapper;
     private final AddressService addressService;
+    private final CorsinaService corsinaService;
 
 
     @Operation(summary = "получить страницу клиентов")
@@ -68,11 +71,10 @@ public class CustomerApi {
     public CustomerOutputDTO save(@RequestBody @Valid CustomerInputDTO customerInputDTO) {
 
         Customer customer = customerDTOMapper.convertToEntity(customerInputDTO);
-
-
+        Corsina corsina = new Corsina();
+        corsinaService.save(corsina);
+        customer.setCurrentCorsina(corsina);
         //убрали костыль
-
-
         return customerDTOMapper.convertToOutputDTO(customerService.save(customer));
     }
 
